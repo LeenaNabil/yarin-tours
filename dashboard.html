@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>يارين تورز - لوحة الإدارة</title>
+    <link rel="icon" type="images/png" href="images/favicon.png.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container { padding: 2rem 5%; }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .btn-add {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-add:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .trips-table {
+            width: 100%;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+        .trips-table th {
+            background: var(--primary-dark);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .trips-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-light);
+            font-size: 1.1rem;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            margin: 0 0.3rem;
+            transition: var(--transition);
+        }
+        .edit-btn { color: #f39c12; }
+        .edit-btn:hover { color: #e67e22; }
+        .delete-btn { color: #e74c3c; }
+        .delete-btn:hover { color: #c0392b; }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius-sm);
+            font-family: inherit;
+        }
+        .path-day, .feature-item {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .path-day input, .feature-item input {
+            flex: 1;
+        }
+        .btn-remove-day {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 40px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+        }
+        .btn-add-day {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+        .btn-save {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-cancel {
+            background: var(--gray-light);
+            color: var(--text-dark);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .tab-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .tab-btn {
+            background: var(--gray-light);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .image-upload-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 5px;
+        }
+        .image-upload-group input[type="text"] {
+            flex: 2;
+        }
+        .image-upload-group input[type="file"] {
+            flex: 2;
+            padding: 0.5rem;
+        }
+        .image-preview {
+            margin-top: 10px;
+            max-width: 150px;
+            display: none;
+        }
+        .image-preview img {
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid var(--gray-light);
+        }
+        small {
+            color: #666;
+            display: block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <img src="images/favicon.png.jpeg" alt="يارين تورز">
+        </div>
+        <nav>
+            <a href="index.html"><i class="fas fa-home"></i> الموقع العام</a>
+            <a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+        </nav>
+    </header>
+
+    <section class="dashboard-container">
+        <div class="dashboard-header">
+            <h2>إدارة المحتوى</h2>
+        </div>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="showSection('trips')">الرحلات</button>
+            <button class="tab-btn" onclick="showSection('packages')">البكجات</button>
+        </div>
+
+        
+        <div id="trips-section">
+            <div class="dashboard-header" style="justify-content: space-between;">
+                <h3>الرحلات</h3>
+                <button class="btn-add" onclick="openAddTripModal()"><i class="fas fa-plus"></i> إضافة رحلة</button>
+            </div>
+            <table class="trips-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم الرحلة</th>
+                        <th>الوجهة</th>
+                        <th>المدة</th>
+                        <th>السعر</th>
+                        <th>المقاعد</th>
+                        <th>المتبقي</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="trips-table-body"></tbody>
+            </table>
+        </div>
+
+      
+        <div id="packages-section" style="display: none;">
+            <div class="dashboard-header" style="justify-content: space-between;">
+                <h3>البكجات</h3>
+                <button class="btn-add" onclick="openAddPackageModal()"><i class="fas fa-plus"></i> إضافة بكج</button>
+            </div>
+            <table class="trips-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم البكج</th>
+                        <th>الوجهة</th>
+                        <th>المدة</th>
+                        <th>السعر</th>
+                        <th>المقاعد</th>
+                        <th>المتبقي</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="packages-table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    
+    <div id="trip-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="trip-modal-title">إضافة رحلة جديدة</h3>
+            <form id="trip-form">
+                <input type="hidden" id="trip-id">
+                <div class="form-group">
+                    <label>اسم الرحلة</label>
+                    <input type="text" id="trip-name" required>
+                </div>
+                <div class="form-group">
+                    <label>الوجهة</label>
+                    <input type="text" id="trip-destination" required>
+                </div>
+                <div class="form-group">
+                    <label>وصف قصير</label>
+                    <input type="text" id="trip-shortDescription" required>
+                </div>
+                <div class="form-group">
+                    <label>المدة</label>
+                    <input type="text" id="trip-duration" required placeholder="مثال: 7 أيام">
+                </div>
+                <div class="form-group">
+                    <label>السعر ($)</label>
+                    <input type="number" id="trip-price" required>
+                </div>
+                <div class="form-group">
+                    <label>عدد المقاعد الإجمالي</label>
+                    <input type="number" id="trip-seats" required>
+                </div>
+                <div class="form-group">
+                    <label>المقاعد المتبقية</label>
+                    <input type="number" id="trip-seatsLeft" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>صورة الرحلة</label>
+                    <div class="image-upload-group">
+                        <input type="text" id="trip-image-url" placeholder="أدخل رابط الصورة (اختياري)">
+                        <span>أو</span>
+                        <input type="file" id="trip-image-file" accept="image/*">
+                    </div>
+                    <small>يمكنك إدخال رابط صورة أو رفع ملف من جهازك (أقصى حجم 2 ميجابايت).</small>
+                    <div id="trip-image-preview" class="image-preview"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>الوصف الكامل</label>
+                    <textarea id="trip-description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الانطلاق</label>
+                    <input type="date" id="trip-startDate" required>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ العودة</label>
+                    <input type="date" id="trip-endDate" required>
+                </div>
+                <div class="form-group">
+                    <label>مسار الرحلة (أضف يوم ثم اضغط إضافة)</label>
+                    <div id="trip-path-container"></div>
+                    <button type="button" class="btn-add-day" onclick="addTripPathDay()">+ إضافة يوم</button>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">حفظ</button>
+                    <button type="button" class="btn-cancel" onclick="closeTripModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+   
+    <div id="package-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="package-modal-title">إضافة بكج جديد</h3>
+            <form id="package-form">
+                <input type="hidden" id="package-id">
+                <div class="form-group">
+                    <label>اسم البكج</label>
+                    <input type="text" id="package-name" required>
+                </div>
+                <div class="form-group">
+                    <label>الوجهة</label>
+                    <input type="text" id="package-destination" required>
+                </div>
+                <div class="form-group">
+                    <label>وصف قصير</label>
+                    <input type="text" id="package-shortDescription" required>
+                </div>
+                <div class="form-group">
+                    <label>المدة</label>
+                    <input type="text" id="package-duration" required placeholder="مثال: 7 أيام / 6 ليال">
+                </div>
+                <div class="form-group">
+                    <label>السعر ($)</label>
+                    <input type="number" id="package-price" required>
+                </div>
+                <div class="form-group">
+                    <label>عدد المقاعد الإجمالي</label>
+                    <input type="number" id="package-seats" required>
+                </div>
+                <div class="form-group">
+                    <label>المقاعد المتبقية</label>
+                    <input type="number" id="package-seatsLeft" required>
+                </div>
+
+               
+                <div class="form-group">
+                    <label>صورة البكج</label>
+                    <div class="image-upload-group">
+                        <input type="text" id="package-image-url" placeholder="أدخل رابط الصورة (اختياري)">
+                        <span>أو</span>
+                        <input type="file" id="package-image-file" accept="image/*">
+                    </div>
+                    <small>يمكنك إدخال رابط صورة أو رفع ملف من جهازك (أقصى حجم 2 ميجابايت).</small>
+                    <div id="package-image-preview" class="image-preview"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>الوصف الكامل</label>
+                    <textarea id="package-description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الانطلاق</label>
+                    <input type="date" id="package-startDate" required>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ العودة</label>
+                    <input type="date" id="package-endDate" required>
+                </div>
+                <div class="form-group">
+                    <label>الخدمات المضمنة (أضف خدمة ثم اضغط إضافة)</label>
+                    <div id="package-features-container"></div>
+                    <button type="button" class="btn-add-day" onclick="addPackageFeature()">+ إضافة خدمة</button>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">حفظ</button>
+                    <button type="button" class="btn-cancel" onclick="closePackageModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
